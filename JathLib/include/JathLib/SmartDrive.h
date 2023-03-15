@@ -1,14 +1,14 @@
 #pragma once
-#include "vex.h"
+#include "v5.h"
 #include "Drive.h"
 #include "TTracker.h"
 
 namespace Jath{
 
-  class SmartDrive{
+  class SmarterDrive{
     public:
 
-      SmartDrive(TTracker* tracker, Drive* holodrive);
+      SmarterDrive(TTracker* tracker, Drive* holodrive);
 
       void cartesianArcade(double x, double y, double rot);
       void cartesianControl(double x, double y, double rot);

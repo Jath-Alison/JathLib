@@ -3,37 +3,37 @@
 
 namespace Jath{
 
-  SmartDrive::SmartDrive(TTracker* tracker, Drive* holodrive):
+  SmarterDrive::SmarterDrive(TTracker* tracker, Drive* holodrive):
     m_tracker(tracker),
     m_drive(holodrive)
     {}
 
-  void SmartDrive::cartesianControl(double cmdX, double cmdY, double cmdRot){
+  void SmarterDrive::cartesianControl(double cmdX, double cmdY, double cmdRot){
     double angle = rad(m_tracker->m_rot);
     double newCmdX =  cmdX*cosf(angle) - cmdY*sinf(angle);
     double newCmdY =  cmdX*sinf(angle) + cmdY*cosf(angle);
     m_drive->arcade(newCmdX, newCmdY, cmdRot);
   }
-  void SmartDrive::cartesianArcade(double cmdX, double cmdY, double cmdRot){
+  void SmarterDrive::cartesianArcade(double cmdX, double cmdY, double cmdRot){
     m_mode = CONTROL;
     m_cmdX = cmdX;
     m_cmdY = cmdY;  
     m_cmdRot = cmdRot;
   }
       
-  void SmartDrive::translateRobot(double x, double y){
+  void SmarterDrive::translateRobot(double x, double y){
     m_mode = AUTO;
     m_targetX = m_tracker->m_x + x;
     m_targetY = m_tracker->m_y + y;
   }
 
-  void SmartDrive::translateField(double x, double y){
+  void SmarterDrive::translateField(double x, double y){
     m_mode = AUTO;
     m_targetX = x;
     m_targetY = y;
   }
 
-  void SmartDrive::update(){
+  void SmarterDrive::update(){
 
     double xDist;
     double yDist;
@@ -83,19 +83,19 @@ namespace Jath{
     cartesianControl(m_cmdX, m_cmdY, m_cmdRot);
   }
 
-  void SmartDrive::setRot(double angle){
+  void SmarterDrive::setRot(double angle){
     m_rotMode = FR_LOCKED;
     rotAngle = angle;
   }
-  void SmartDrive::setRot(double x, double y){
+  void SmarterDrive::setRot(double x, double y){
     m_rotMode = LOCKED_TO_POINT;
     rotPoint = {x,y};
   }
-  void SmartDrive::setRot(){
+  void SmarterDrive::setRot(){
     m_rotMode = UNLOCKED;
   }
 
-  bool SmartDrive::atTarget(double posRange, double angleRange){
+  bool SmarterDrive::atTarget(double posRange, double angleRange){
     double errorX = m_targetX - m_tracker->m_x;
     double errorY = m_targetY - m_tracker->m_y;
     double errorRot = m_targetRot - m_tracker->m_rot;

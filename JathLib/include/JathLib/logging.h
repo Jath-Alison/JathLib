@@ -9,7 +9,7 @@
 #include <chrono>
 #include <vector>
 #include <thread>
-#include "deviceConfig.h"
+#include "robot-config.h"
 
 namespace Jath{
 
