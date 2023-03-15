@@ -1,6 +1,6 @@
-using namespace vex;
+#pragma once
 
-extern brain Brain;
+extern vex::brain Brain;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
