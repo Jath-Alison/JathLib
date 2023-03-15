@@ -1,4 +1,5 @@
 #include "vex.h"
+#include "JathLib/JathLib.h"
 
 // A global instance of brain used for printing to the V5 brain screen
 vex::brain Brain;

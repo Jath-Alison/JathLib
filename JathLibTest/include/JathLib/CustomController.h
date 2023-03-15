@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace Jath{
-  class customController{
+  class CustomController{
       public:
         enum buttons{
             pUp, pDown, pLeft, pRright,
@@ -16,15 +16,15 @@ namespace Jath{
             sLUp, sLDown, sRUp, sRDown
         };
 
-        customController(vex::controller* primaryControllerPtr) :
+        CustomController(vex::controller* primaryControllerPtr) :
             m_pC(primaryControllerPtr), m_sC(nullptr){}
-        customController(vex::controller* primaryControllerPtr, vex::controller* secondaryControllerPtr) : 
+        CustomController(vex::controller* primaryControllerPtr, vex::controller* secondaryControllerPtr) : 
             m_pC(primaryControllerPtr), m_sC(secondaryControllerPtr){}
 
-        bool checkInput(customController::buttons buttonToCheck){
+        bool checkInput(CustomController::buttons buttonToCheck){
             return enumToButton[buttonToCheck].pressing();
         }
-        bool checkInput(std::vector<customController::buttons> buttonsToCheck){
+        bool checkInput(std::vector<CustomController::buttons> buttonsToCheck){
             for(int i=0; i<buttonsToCheck.size(); i++){
                 if(!enumToButton[buttonsToCheck[i]].pressing()){
                     return false;
@@ -36,7 +36,7 @@ namespace Jath{
         vex::controller* m_pC;//Primary Controller
         vex::controller* m_sC;//Secondary Controller
 
-        std::map <customController::buttons, vex::controller::button> enumToButton{            
+        std::map <CustomController::buttons, vex::controller::button> enumToButton{            
             {pUp , m_pC->ButtonUp}, {pDown ,m_pC->ButtonDown}, {pLeft ,m_pC->ButtonLeft}, {pRright ,m_pC->ButtonRight},
             {pA ,m_pC->ButtonA}, {pB ,m_pC->ButtonB}, {pX ,m_pC->ButtonX}, {pY ,m_pC->ButtonY},
             {pLUp ,m_pC->ButtonL1}, {pLDown ,m_pC->ButtonL2}, {pRUp ,m_pC->ButtonR1}, {pRDown ,m_pC->ButtonR2},
@@ -52,21 +52,21 @@ namespace Jath{
       buttonMapping(const char* name) {
           strcpy(m_name,name);
       }
-      buttonMapping(const char* name, customController::buttons button) {
+      buttonMapping(const char* name, CustomController::buttons button) {
           m_buttons.push_back(button);
           strcpy(m_name,name);
       }
-      buttonMapping(const char* name,std::vector<customController::buttons> buttons) : m_buttons(buttons){
+      buttonMapping(const char* name,std::vector<CustomController::buttons> buttons) : m_buttons(buttons){
         strcpy(m_name,name);
       }
 
-      void addButton(customController::buttons button) {
+      void addButton(CustomController::buttons button) {
         m_buttons.push_back(button);
       }
       char* getName(){return m_name;}
-      std::vector<customController::buttons> getButtons(){return m_buttons;}
+      std::vector<CustomController::buttons> getButtons(){return m_buttons;}
     private:
       char* m_name;
-      std::vector<customController::buttons> m_buttons;
+      std::vector<CustomController::buttons> m_buttons;
 };
 }

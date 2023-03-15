@@ -6,3 +6,4 @@
 #include "logging.h"
 #include "MathUtils.h"
 #include "PID.h"
+#include "deviceConfig.h"
