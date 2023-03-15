@@ -21,21 +21,21 @@ namespace Jath{
       return std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count()/1000.f;
   }
 
-  class logFile{
+  class LogFile{
     public:
 
-      struct logItem{
-       logItem(const char* name, std::function<double(void)> func) : m_function(func){
+      struct LogItem{
+       LogItem(const char* name, std::function<double(void)> func) : m_function(func){
          std::strcpy(m_name, name);
        };
-       logItem(const logItem& item) : m_function(item.m_function){
+       LogItem(const LogItem& item) : m_function(item.m_function){
          std::strcpy(m_name, item.m_name);
        };
        char m_name[50];
        std::function<double(void)> m_function;
       };
 
-      logFile(const char* path){
+      LogFile(const char* path){
         //m_path = new char[50];
         std::strcpy(m_path, path);
         std::strcat(m_path, ".csv");
@@ -56,11 +56,11 @@ namespace Jath{
       }
        
       void addLogItem(const char* name, std::function<double(void)> data){
-        logItem temp(name,data);
-        m_logItems.push_back(temp);
+        LogItem temp(name,data);
+        m_LogItems.push_back(temp);
       }
-      void addLogItem(logItem item){
-        m_logItems.push_back(item);
+      void addLogItem(LogItem item){
+        m_LogItems.push_back(item);
       }
 
       void openFile (){
@@ -70,22 +70,22 @@ namespace Jath{
         m_file.close();
       }
 
-      void logHeader(){
+      void LogHeader(){
         m_file.open(m_path,std::ios_base::app);
-        for(size_t i = 0; i < m_logItems.size(); i++){
-          m_file << m_logItems[i].m_name;
-          if(!(i == m_logItems.size()-1)){
+        for(size_t i = 0; i < m_LogItems.size(); i++){
+          m_file << m_LogItems[i].m_name;
+          if(!(i == m_LogItems.size()-1)){
             m_file << ",";
           }
         }
         m_file<<std::endl;
         m_file.close();
       }
-      void log(){
+      void Log(){
         m_file.open(m_path,std::ios_base::app);
-        for(size_t i = 0; i<m_logItems.size(); i++){
-          m_file << m_logItems[i].m_function();
-          if(!(i == m_logItems.size()-1)){
+        for(size_t i = 0; i<m_LogItems.size(); i++){
+          m_file << m_LogItems[i].m_function();
+          if(!(i == m_LogItems.size()-1)){
             m_file << ",";
           }
         }
@@ -95,22 +95,22 @@ namespace Jath{
 
     private:
       char m_path[50];
-      std::vector<logItem> m_logItems;
+      std::vector<LogItem> m_LogItems;
       std::ofstream m_file;
   };
 
-  std::vector<logFile*> logFiles;
+  std::vector<LogFile*> LogFiles;
 
-  int logAllHeaders(){
-    for(int i = 0;i<logFiles.size();i++){
-      logFiles[i]->logHeader();
+  int LogAllHeaders(){
+    for(int i = 0;i<LogFiles.size();i++){
+      LogFiles[i]->LogHeader();
     }  
     return 0;
   }
 
-  int logAll(){
-    for(int i = 0;i<logFiles.size();i++){
-      logFiles[i]->log();
+  int LogAll(){
+    for(int i = 0;i<LogFiles.size();i++){
+      LogFiles[i]->Log();
     }  
     return 0;
   }

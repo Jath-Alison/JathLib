@@ -22,15 +22,15 @@ namespace Jath{
             m_pC(primaryControllerPtr), m_sC(secondaryControllerPtr){}
 
         bool checkInput(CustomController::buttons buttonToCheck){
-            return enumToButton[buttonToCheck].pressing();
+          return enumToButton[buttonToCheck].pressing();
         }
         bool checkInput(std::vector<CustomController::buttons> buttonsToCheck){
-            for(int i=0; i<buttonsToCheck.size(); i++){
-                if(!enumToButton[buttonsToCheck[i]].pressing()){
-                    return false;
-                }
+          for(int i=0; i<buttonsToCheck.size(); i++){
+              if(!enumToButton[buttonsToCheck[i]].pressing()){
+                return false;
             }
-            return true;
+          }
+          return true;
         }
       private:
         vex::controller* m_pC;//Primary Controller
