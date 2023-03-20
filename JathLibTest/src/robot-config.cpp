@@ -4,6 +4,12 @@
 // A global instance of brain used for printing to the V5 brain screen
 vex::brain Brain;
 
+vex::controller cont(vex::primary);
+
+vex::rotation testRot(vex::PORT4);
+vex::motor tempMotor(vex::PORT3);
+Jath::CustomMotor testMotor(tempMotor, &testRot);
+
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
  *

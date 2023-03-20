@@ -2,7 +2,7 @@
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
 /*    Author:       C:\Users\jatha                                            */
-/*    Created:      Tue Mar 14 2023                                           */
+/*    Created:      Mon Mar 20 2023                                           */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
@@ -12,19 +12,14 @@
 
 #include "vex.h"
 
-#include "JathLib/JathLib.h"
+#include "Jathlib/Jathlib.h"
+
+using namespace vex;
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
+
   
-  testMotor.setControlMode(Jath::CustomMotor::Position);
-
-  while(true){
-
-    testMotor.set(cont.Axis3.position());
-    
-    vex::wait(20, vex::msec);
-  }
   
 }
