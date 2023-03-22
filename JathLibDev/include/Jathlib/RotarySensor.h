@@ -14,7 +14,7 @@ namespace Jath{
         Null
       };
       Type getType(){return m_type;}
-      void setType(Type typ){ m_type = typ;}
+      //void setType(Type typ){ m_type = typ;}
       virtual double getPosition() {return 0;};
       virtual double getVelocity() {return 0;}; 
       virtual double getAngle() {return 0;};
@@ -46,6 +46,7 @@ namespace Jath{
       Pot(vex::triport::port& t) : vex::pot(t){
         m_type = Type::Pot;
       }; 
+      double getPosition() override {return angle(vex::degrees);}
       double getAngle() override {return angle(vex::degrees);};
   };  
   class PotV2 : public Sensor, public vex::potV2{
@@ -53,6 +54,7 @@ namespace Jath{
       PotV2(vex::triport::port& t) : vex::potV2(t){
         m_type = Type::PotV2;
       }; 
+      double getPosition() override {return angle(vex::degrees);}
       double getAngle() override {return angle(vex::degrees);};
   };  
 }

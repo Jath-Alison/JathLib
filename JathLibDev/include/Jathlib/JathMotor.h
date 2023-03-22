@@ -4,6 +4,7 @@
 #include "Jathlib/PID.h"
 #include "Jathlib/Logger.h"
 #include "Jathlib/MathUtils.h"
+#include "Jathlib/RotarySensor.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -16,6 +17,7 @@ namespace Jath{
       enum ControlMode{
         DutyCycle,
         Position,
+        Angle,
         Velocity,
         Follower,
         None
@@ -24,6 +26,7 @@ namespace Jath{
       JathMotor(const JathMotor& mot): 
         vex::motor(mot), 
         m_logFile(mot.m_logFile),
+        m_sensor(mot.m_sensor),
         m_followMotor(mot.m_followMotor),
         m_pid(mot.m_pid),
         m_cmd(mot.m_cmd),m_output(mot.m_output),
@@ -42,7 +45,7 @@ namespace Jath{
         JathMotors.push_back(this);
       }
 
-      JathMotor(std::string name,vex::motor mot): motor(mot), m_logFile(nullptr)
+      JathMotor(std::string name,vex::motor mot): motor(mot), m_logFile(nullptr), m_sensor(nullptr)
       {
         m_logFile = std::make_shared<Logger>(name);
         JathMotors.push_back(this);
@@ -57,6 +60,11 @@ namespace Jath{
         m_logFile = nullptr;
       }
 
+      JathMotor& withSensor(Jath::Sensor sensor){
+        m_sensor = std::make_shared<Jath::Sensor>(sensor);
+        return *this;
+      }
+      
       JathMotor& withConstants(double p, double i, double d){
         m_pid.setConstants(p, i, d);
         return *this;
@@ -99,17 +107,39 @@ namespace Jath{
       }
 
       void update(){
+
+        double value = 0;
+
         switch(m_controlMode){
           case DutyCycle:
             m_output = m_cmd * 12/100.f;
             spin(vex::fwd, m_output, vex::volt);
             break;
           case Position:
-            m_output = m_pid.calculateValue(m_cmd, position(vex::degrees)) * 12/100.f;
+            if(m_sensor){
+              value = m_sensor->getPosition();
+            }else {
+              value = position(vex::degrees);
+            }            
+            m_output = m_pid.calculateValue(m_cmd, value) * 12/100.f;
+            spin(vex::fwd, m_output, vex::volt);
+            break;
+          case Angle:
+            if(m_sensor){
+              value = m_sensor->getAngle();
+            }else {
+              value = position(vex::degrees);
+            }
+            m_output = m_pid.calculateValue(m_cmd, value) * 12/100.f;
             spin(vex::fwd, m_output, vex::volt);
             break;
           case Velocity:
-            m_output += m_pid.calculateValue(m_cmd, velocity(vex::rpm)) * 12/100.f;
+            if(m_sensor){
+              value = m_sensor->getVelocity();
+            }else {
+              value = velocity(vex::rpm);
+            }
+              m_output += m_pid.calculateValue(m_cmd, value) * 12/100.f;
             spin(vex::fwd, m_output, vex::volt);
             break;
           case Follower:
@@ -127,6 +157,7 @@ namespace Jath{
       static inline std::vector<JathMotor*> JathMotors;
 
       Jath::PID m_pid;
+      std::shared_ptr<Jath::Sensor> m_sensor;
     private:
       std::shared_ptr<Jath::Logger> m_logFile;
       friend void logAllMotorHeaders();
@@ -135,6 +166,7 @@ namespace Jath{
       std::map<ControlMode, std::string> ModeToString{
         {DutyCycle, "DutyCycle"},
         {Position, "Position"},
+        {Angle, "Angle"},
         {Velocity, "Velocity"},
         {Follower, "Follower"},
         {None, "None"},

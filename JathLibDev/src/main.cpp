@@ -19,8 +19,9 @@ Jath::RotationSensor testRot(vex::PORT10);
 Jath::Encoder testEncoder = Jath::Encoder(Brain.ThreeWirePort.C);
 
 Jath::JathMotor test = Jath::JathMotor("Logs/TestMotor",vex::motor(vex::PORT2))
+  .withSensor(Jath::RotationSensor(vex::rotation(vex::PORT3)))
   .withConstants(1, 0.1, 0.2)
-  .withControlMode(Jath::JathMotor::ControlMode::Position);
+  .withControlMode(Jath::JathMotor::ControlMode::Angle);
 
 Jath::JathMotor follower = Jath::JathMotor("Logs/FollowerMotor",vex::motor(vex::PORT8))
   .withControlMode(Jath::JathMotor::ControlMode::Follower)
@@ -43,7 +44,7 @@ int main() {
     }
 
     Brain.Screen.setCursor(1, 1);
-    Brain.Screen.print("Number of motors %d", Jath::JathMotor::JathMotors.size());
+    Brain.Screen.print("Number of motors %d", Jath::JathMotor::JathMotors[0]->m_sensor->getAngle());
 
     Jath::updateAllMotors();
     
