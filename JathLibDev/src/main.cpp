@@ -31,24 +31,19 @@ int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  // vex::task t1 = vex::task(Jath::logAllMotorsTask);
+  vex::task t1 = vex::task(Jath::logAllMotorsTask);
 
-  Jath::Logger testLogger("Logs/TestLogger");
-
-  testLogger.addLogItem("time", []{ return Jath::timePassed(); });
-  testLogger.addLogItem("cmdType", []{return test.get(); });
-
-  testLogger.logHeader();
 
   while(true){
 
-    if(cont.ButtonA.pressing()){
+    if(Brain.Screen.pressing()){
       test.set(100);
     }else {
       test.set(0);
     }
 
-    testLogger.log();
+    Brain.Screen.setCursor(1, 1);
+    Brain.Screen.print("Number of motors %d", Jath::JathMotor::JathMotors.size());
 
     Jath::updateAllMotors();
     
