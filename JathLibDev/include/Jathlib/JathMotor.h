@@ -23,18 +23,13 @@ namespace Jath{
 
       JathMotor(const JathMotor& mot): 
         vex::motor(mot), 
-        m_name(mot.m_name),
         m_logFile(mot.m_logFile),
         m_followMotor(mot.m_followMotor),
         m_pid(mot.m_pid),
         m_cmd(mot.m_cmd),m_output(mot.m_output),
         m_controlMode(mot.m_controlMode)
-      {JathMotors.push_back(this);}
-
-      JathMotor(std::string name,vex::motor mot): motor(mot),m_name(name), m_logFile(nullptr)
       {
-        m_logFile = std::make_shared<Logger>(name);
-
+        
         m_logFile->addLogItem("time", [this]{ return Jath::timePassed(); });
         m_logFile->addLogItem("cmdType", [this]{return getControlMode(); });
         m_logFile->addLogItem("cmd", [this]{return get(); });
@@ -43,7 +38,13 @@ namespace Jath{
         m_logFile->addLogItem("temprature", [this]{return temperature(); });
         m_logFile->addLogItem("output%", [this]{return getOutput()*100/12.f; });
         m_logFile->addLogItem("pos", [this]{ return position(vex::degrees); });
+        
+        JathMotors.push_back(this);
+      }
 
+      JathMotor(std::string name,vex::motor mot): motor(mot), m_logFile(nullptr)
+      {
+        m_logFile = std::make_shared<Logger>(name);
         JathMotors.push_back(this);
       }
 
@@ -119,16 +120,17 @@ namespace Jath{
             spin(vex::fwd, m_output, vex::volt);
             break;
           case None:
-
             break;
         }
       }
 
-      Jath::PID m_pid;
       static inline std::vector<JathMotor*> JathMotors;
-      std::shared_ptr<Jath::Logger> m_logFile;
 
+      Jath::PID m_pid;
     private:
+      std::shared_ptr<Jath::Logger> m_logFile;
+      friend void logAllMotorHeaders();
+      friend void logAllMotors();
 
       std::map<ControlMode, std::string> ModeToString{
         {DutyCycle, "DutyCycle"},
@@ -137,8 +139,6 @@ namespace Jath{
         {Follower, "Follower"},
         {None, "None"},
       };
-
-      std::string m_name;
 
       ControlMode m_controlMode{None};
 
