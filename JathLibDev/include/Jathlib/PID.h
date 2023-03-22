@@ -6,6 +6,7 @@ namespace Jath{
     public:
       PID(){}
       PID(double kp, double ki, double kd): m_kp(kp), m_ki(kd), m_kd(kd){}
+      PID(const PID& pid): m_kp(pid.m_kp), m_ki(pid.m_ki), m_kd(pid.m_kd){}
 
       void clear(){
         m_error = 0;
