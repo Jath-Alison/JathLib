@@ -51,6 +51,30 @@ namespace Jath{
         return m_output;
       }
 
+      double calculateValue(double error){
+        
+        m_error = error;
+
+        m_derivative = m_prevError - m_error; 
+        if (fabs(m_derivative) > m_maxDerivative){
+          m_maxDerivative = fabs(m_derivative);
+        }
+
+        if(fabs(m_error) < m_integralZone){
+          m_integral += m_error;   
+        }else {
+          m_integral = 0;
+        }
+        if ((m_error > 0 && m_prevError < 0) || (m_error < 0 && m_prevError > 0)){
+          m_integral = 0; 
+        }
+
+        m_output = (m_kp * m_error) + (m_kd * m_derivative) + (m_ki * m_integral);
+
+        m_prevError = m_error;      
+        return m_output;
+      }
+
     private:
 
       double m_error{0};

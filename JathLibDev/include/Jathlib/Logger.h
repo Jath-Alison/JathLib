@@ -22,10 +22,37 @@ namespace Jath{
     public:
 
       struct logItem{
-        logItem(std::string name, std::function<double(void)> func) : m_name(name), m_function(func){};
-        logItem(const logItem& item) : m_name(item.m_name), m_function(item.m_function){};
+        // logItem(std::string name, std::function<double(void)> func) : m_name(name), m_function(func){};
+        // logItem(const logItem& item) : m_name(item.m_name), m_function(item.m_function){};
+        virtual void logHeader(std::ofstream* file) = 0;
+        virtual void log(std::ofstream* file) = 0;
+        // std::string m_name;
+        // std::function<double(void)> m_function;
+      };
+
+      struct LogItemB : public logItem{
+        LogItemB(std::string name, std::function<bool(void)> func) : m_name(name), m_function(func){};
+        LogItemB(const LogItemB& item) : m_name(item.m_name), m_function(item.m_function){};
+        void logHeader(std::ofstream* file){ *file << m_name; }
+        void log(std::ofstream* file){ *file << m_function(); }
+        std::string m_name;
+        std::function<bool(void)> m_function;
+      };
+      struct LogItemD : public logItem{
+        LogItemD(std::string name, std::function<double(void)> func) : m_name(name), m_function(func){};
+        LogItemD(const LogItemD& item) : m_name(item.m_name), m_function(item.m_function){};
+        void logHeader(std::ofstream* file){ *file << m_name; }
+        void log(std::ofstream* file){ *file << m_function(); }
         std::string m_name;
         std::function<double(void)> m_function;
+      };
+      struct LogItemS : public logItem{
+        LogItemS(std::string name, std::function<std::string(void)> func) : m_name(name), m_function(func){};
+        LogItemS(const LogItemS& item) : m_name(item.m_name), m_function(item.m_function){};
+        void logHeader(std::ofstream* file){ *file << m_name; }
+        void log(std::ofstream* file){ *file << m_function(); }
+        std::string m_name;
+        std::function<std::string(void)> m_function;
       };
 
       Logger(std::string path){

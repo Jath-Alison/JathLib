@@ -60,8 +60,8 @@ namespace Jath{
         m_logFile = nullptr;
       }
 
-      JathMotor& withSensor(Jath::Sensor sensor){
-        m_sensor = std::make_shared<Jath::Sensor>(sensor);
+      JathMotor& withSensor(Sensor* sensorPointer){
+        m_sensor = sensorPointer;
         return *this;
       }
       
@@ -108,7 +108,7 @@ namespace Jath{
 
       void update(){
 
-        double value = 0;
+        double turnError = 0;
 
         switch(m_controlMode){
           case DutyCycle:
@@ -127,10 +127,17 @@ namespace Jath{
           case Angle:
             if(m_sensor){
               value = m_sensor->getAngle();
+              turnError = m_cmd - value;
+              if(m_sensor->getType() != Sensor::Type::Pot && m_sensor->getType() != Sensor::Type::PotV2){
+                turnError = bestTurnPath(turnError);
+              }
             }else {
-              value = position(vex::degrees);
+              value = angleTo180Range( position(vex::degrees) );
+              value = bestTurnPath(value);
             }
-            m_output = m_pid.calculateValue(m_cmd, value) * 12/100.f;
+
+            m_output = m_pid.calculateValue(turnError) * 12/100.f;
+
             spin(vex::fwd, m_output, vex::volt);
             break;
           case Velocity:
@@ -156,8 +163,9 @@ namespace Jath{
 
       static inline std::vector<JathMotor*> JathMotors;
 
+      double value = 0;
       Jath::PID m_pid;
-      std::shared_ptr<Jath::Sensor> m_sensor;
+      Jath::Sensor* m_sensor;
     private:
       std::shared_ptr<Jath::Logger> m_logFile;
       friend void logAllMotorHeaders();
