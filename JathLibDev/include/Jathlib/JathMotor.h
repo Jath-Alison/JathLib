@@ -33,14 +33,14 @@ namespace Jath{
         m_controlMode(mot.m_controlMode)
       {
         
-        m_logFile->addLogItem("time", [this]{ return Jath::timePassed(); });
-        m_logFile->addLogItem("cmdType", [this]{return getControlMode(); });
-        m_logFile->addLogItem("cmd", [this]{return get(); });
-        m_logFile->addLogItem("velocity", [this]{ return velocity(vex::rpm); });
-        m_logFile->addLogItem("torque", [this]{ return torque(); });
-        m_logFile->addLogItem("temprature", [this]{return temperature(); });
-        m_logFile->addLogItem("output%", [this]{return getOutput()*100/12.f; });
-        m_logFile->addLogItem("pos", [this]{ return position(vex::degrees); });
+        m_logFile->addLogItemD("time", [this]{ return Jath::timePassed(); });
+        m_logFile->addLogItemS("cmdType", [this]{return ModeToString[getControlMode()]; });
+        m_logFile->addLogItemD("cmd", [this]{return get(); });
+        m_logFile->addLogItemD("velocity", [this]{ return velocity(vex::rpm); });
+        m_logFile->addLogItemD("torque", [this]{ return torque(); });
+        m_logFile->addLogItemD("temprature", [this]{return temperature(); });
+        m_logFile->addLogItemD("output%", [this]{return getOutput()*100/12.f; });
+        m_logFile->addLogItemD("pos", [this]{ return position(vex::degrees); });
         
         JathMotors.push_back(this);
       }
