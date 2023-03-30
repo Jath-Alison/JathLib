@@ -14,45 +14,45 @@
 
 #include "Jathlib/Jathlib.h"
 
+Jath::JathController testController(&cont,&contS);
 
-Jath::RotationSensor testRot(vex::PORT8);
+
+Jath::RotationSensor testRot(vex::PORT14);
 Jath::PotV2 testPot(Brain.ThreeWirePort.A);
 Jath::Encoder testEncoder = Jath::Encoder(Brain.ThreeWirePort.C);
 
 Jath::JathMotor test = Jath::JathMotor("Logs/AngleTestMotor",vex::motor(vex::PORT2,false))
-  .withSensor(&testRot)
+  // .withSensor(&testRot)
   .withConstants(1, 0, 0)
-  .withControlMode(Jath::JathMotor::ControlMode::Angle);
-
-Jath::JathMotor follower = Jath::JathMotor("Logs/FollowerMotor",vex::motor(vex::PORT8))
-  .withControlMode(Jath::JathMotor::ControlMode::Follower)
-  .withLeader(&test);
+  .withControlMode(Jath::JathMotor::ControlMode::Angle)
+  .withFollower(vex::motor(vex::PORT3));
 
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  vex::task t1 = vex::task(Jath::logAllMotorsTask);
+  vex::task t1(Jath::logAllMotorsTask);
 
   while(true){
-
-    if(Brain.Screen.pressing()){
-      test.set(0);//
-    }else {
-      test.set(180);
+    if(testController.getInputPressed(Jath::JathController::buttons::pA)){
+      test.set(100);
+    }
+    if(testController.getInput(Jath::JathController::buttons::pA) && test.getOutput() < 20){
+      test.set(50);
+    }
+    if(testController.getInputReleased(Jath::JathController::buttons::pA)){
+      test.set(0);
     }
 
     // Brain.Screen.setCursor(1, 1);
     // Brain.Screen.print("position %f", test.get() - testRot.getAngle()) ; //Jath::JathMotor::JathMotors[0]->m_sensor->getAngle());
     Brain.Screen.setCursor(2, 1);
-    Brain.Screen.print("Angle: %f", testRot.getAngle());
+    Brain.Screen.print("Num Motors: %d", Jath::JathMotor::JathMotors.size());
     Brain.Screen.setCursor(3, 1);
-    Brain.Screen.print("Angle to 180: %f", Jath::angleTo180Range(testRot.getAngle()) );
+    Brain.Screen.print("Motor 0: %f", Jath::JathMotor::JathMotors[0]->getLeader()->position(vex::degrees));
     Brain.Screen.setCursor(4, 1);
-    Brain.Screen.print("Shortest angle: %f", Jath::bestTurnPath( Jath::angleTo180Range(testRot.getAngle())  ));
-    Brain.Screen.setCursor(5, 1);
-    Brain.Screen.print("act output: %f", test.getOutput());
+    Brain.Screen.print("Motor 1: %f", Jath::JathMotor::JathMotors[1]->position(vex::degrees));
 
     Jath::updateAllMotors();
     

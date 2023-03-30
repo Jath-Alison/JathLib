@@ -7,6 +7,7 @@
 #include "Jathlib/RotarySensor.h"
 #include <vector>
 #include <string>
+#include <cstring>
 #include <map>
 #include <memory>
 
@@ -30,8 +31,13 @@ namespace Jath{
         m_followMotor(mot.m_followMotor),
         m_pid(mot.m_pid),
         m_cmd(mot.m_cmd),m_output(mot.m_output),
-        m_controlMode(mot.m_controlMode)
+        m_controlMode(mot.m_controlMode),
+        m_followingMotors(mot.m_followingMotors)
       {
+
+        for(int i = 0;i<m_followingMotors.size();i++){
+          m_followingMotors[i]->setLeader(this);
+        }
         
         m_logFile->addLogItemD("time", [this]{ return Jath::timePassed(); });
         m_logFile->addLogItemS("cmdType", [this]{return ModeToString[getControlMode()]; });
@@ -45,7 +51,7 @@ namespace Jath{
         JathMotors.push_back(this);
       }
 
-      JathMotor(std::string name,vex::motor mot): motor(mot), m_logFile(nullptr), m_sensor(nullptr)
+      JathMotor(std::string name,vex::motor mot): motor(mot), m_followMotor(nullptr), m_logFile(nullptr), m_sensor(nullptr)
       {
         m_logFile = std::make_shared<Logger>(name);
         JathMotors.push_back(this);
@@ -62,6 +68,10 @@ namespace Jath{
 
       JathMotor& withSensor(Sensor* sensorPointer){
         m_sensor = sensorPointer;
+        m_logFile->addLogItemD("sensorPos", [this]{return m_sensor->getPosition();});
+        m_logFile->addLogItemD("sensorVelocity", [this]{return m_sensor->getVelocity();});
+        m_logFile->addLogItemD("sensorAngle", [this]{ return m_sensor->getAngle();});
+        
         return *this;
       }
       
@@ -75,8 +85,21 @@ namespace Jath{
         return *this;
       }
 
-      JathMotor& withLeader(vex::motor* leader){
+      JathMotor& withLeader(JathMotor* leader){
         m_followMotor = leader;
+        return *this;
+      }
+      JathMotor& withFollower(vex::motor mot){
+        int count = ((int)JathMotors.size());
+        char countStr[4] = "";
+        sprintf(countStr, "%d",count);
+
+        JathMotor* temp = new JathMotor (m_name + "follower" + countStr ,mot);
+        temp->setControlMode(Follower);
+        temp->setLeader(this);
+
+        m_followingMotors.push_back(temp);
+
         return *this;
       }
 
@@ -88,6 +111,17 @@ namespace Jath{
       }
       void setControlMode(ControlMode mode){
         m_controlMode = mode;
+      }
+      void addFollower(vex::motor mot){
+        int count = ((int)JathMotors.size());
+        char countStr[4] = "";
+        sprintf(countStr, "%d",count);
+
+        JathMotor* temp = new JathMotor (m_name + "follower" + countStr ,mot);
+        temp->setControlMode(Follower);
+        temp->setLeader(this);
+
+        m_followingMotors.push_back(temp);
       }
 
       double get(){
@@ -102,8 +136,11 @@ namespace Jath{
         m_cmd = input;
       }
 
-      void setLeader(vex::motor* leader){
+      void setLeader(JathMotor* leader){
         m_followMotor = leader;
+      }
+      JathMotor* getLeader(){
+        return m_followMotor;
       }
 
       void update(){
@@ -133,7 +170,7 @@ namespace Jath{
               }
             }else {
               value = angleTo180Range( position(vex::degrees) );
-              value = bestTurnPath(value);
+              turnError = bestTurnPath(m_cmd - value);
             }
 
             m_output = m_pid.calculateValue(turnError) * 12/100.f;
@@ -171,6 +208,8 @@ namespace Jath{
       friend void logAllMotorHeaders();
       friend void logAllMotors();
 
+      std::string m_name;
+
       std::map<ControlMode, std::string> ModeToString{
         {DutyCycle, "DutyCycle"},
         {Position, "Position"},
@@ -182,7 +221,8 @@ namespace Jath{
 
       ControlMode m_controlMode{None};
 
-      vex::motor* m_followMotor{nullptr};
+      JathMotor* m_followMotor{nullptr};
+      std::vector<JathMotor *> m_followingMotors;
 
       double m_cmd{0};
       double m_output{0};
